@@ -27,7 +27,7 @@ exports.getBookDetails = async (req, res) => {
 };
 
 exports.createBook = async (req, res) => {
-  const { title, author, genreName, description } = req.body;
+  const { title, author, genreName, status, description } = req.body;
 
   try {
     // Find the genre by name (case-insensitive)
@@ -43,6 +43,7 @@ exports.createBook = async (req, res) => {
       title,
       author,
       genre: genre._id, // Use the ObjectId of the genre
+      status,
       description,
     });
 
@@ -55,7 +56,7 @@ exports.createBook = async (req, res) => {
 };
 
 exports.updateBook = async (req, res) => {
-  const { title, author, genreName, description } = req.body;
+  const { title, author, genreName, status, description } = req.body;
 
   try {
     // Find book and validate existence
@@ -81,6 +82,7 @@ exports.updateBook = async (req, res) => {
     // Update other fields if provided
     if (title) book.title = title;
     if (author) book.author = author;
+    if (status) book.status = status;
     if (description) book.description = description;
 
     // Save changes

@@ -25,6 +25,12 @@ const bookSchema = new Schema({
     ref: "Genre",
     required: [true, "Genre is required"],
   },
+  status: {
+    type: String,
+    enum: ["Want to Read", "Reading", "Read"],
+    required: [true, "Reading status is required"],
+    default: "Want to Read",
+  },
   description: {
     type: String,
     trim: true,

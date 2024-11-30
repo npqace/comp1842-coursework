@@ -57,7 +57,7 @@ onMounted(() => {
           <p class="text-gray-300">by {{ book.author }}</p>
           <span
             :class="{
-              'text-yellow-400': book.status === 'Unread',
+              'text-red-400': book.status === 'Want to Read',
               'text-blue-400': book.status === 'Reading',
               'text-green-400': book.status === 'Completed',
             }"

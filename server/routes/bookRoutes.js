@@ -74,6 +74,8 @@ router.get("/:id", auth, bookController.getBookDetails);
  *                 type: string
  *               genre:
  *                 type: string
+ *              status:
+ *                type: string
  *               description:
  *                 type: string
  *     responses:
@@ -112,6 +114,8 @@ router.post("/", auth, bookController.createBook);
  *                 type: string
  *               genre:
  *                 type: string
+ *              status:
+ *               type: string
  *               description:
  *                 type: string
  *     responses:

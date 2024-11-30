@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import api from "../../utils/axios";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -10,7 +10,7 @@ const error = ref(null);
 
 const fetchBooks = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/books");
+    const response = await api.get("/books");
     books.value = response.data;
     loading.value = false;
   } catch (err) {
@@ -25,7 +25,7 @@ const viewBookDetails = (bookId) => {
 
 const deleteBook = async (bookId) => {
   try {
-    await axios.delete(`http://localhost:3000/books/${bookId}`);
+    await api.delete(`/books/${bookId}`);
     books.value = books.value.filter((book) => book._id !== bookId);
   } catch (err) {
     console.log({ msg: "Failed to delete book", err });
@@ -42,7 +42,7 @@ onMounted(() => {
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold">Books Management</h1>
       <button
-        @click="router.push('/books/new')"
+        @click="router.push('/books')"
         class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300"
       >
         Add New Book
@@ -97,9 +97,9 @@ onMounted(() => {
             <td class="px-6 py-4 whitespace-nowrap">
               <span
                 :class="{
-                  'text-yellow-400': book.status === 'Unread',
+                  'text-red-400': book.status === 'Want to Read',
                   'text-blue-400': book.status === 'Reading',
-                  'text-green-400': book.status === 'Completed',
+                  'text-green-400': book.status === 'Read',
                 }"
               >
                 {{ book.status }}
