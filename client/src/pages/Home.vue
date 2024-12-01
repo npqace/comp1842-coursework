@@ -12,7 +12,8 @@ const error = ref(null);
 const fetchRecentBooks = async () => {
   try {
     const response = await api.get("/books");
-    recentBooks.value = response.data.slice(0, 5); // Get only 5 recent books
+    // Sort books by creation date in descending order and get the top 5 recent books
+    recentBooks.value = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
     loading.value = false;
   } catch (err) {
     error.value = "Failed to load books";
