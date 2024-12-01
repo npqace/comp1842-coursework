@@ -33,7 +33,6 @@ export default {
           password: password.value,
         });
         console.log("Registration successful!");
-        // alert("Registration successful");
         router.push("/login");
       } catch (error) {
         console.error(error);
