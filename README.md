@@ -158,7 +158,9 @@ client/
 |   ├── utils/
 |   |   ├── axios.js
 |   ├── App.vue
-|   └── main.js
+|   ├── main.js
+|   ├── tailwind.config.js
+|   ├── postcss.config.js
 ```
 
 ## API Documentation
