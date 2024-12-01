@@ -1,4 +1,3 @@
-// client/src/components/Profile/ProfileForm.vue
 <script setup>
 import { ref, watch } from "vue";
 
