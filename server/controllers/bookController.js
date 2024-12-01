@@ -13,7 +13,9 @@ exports.getAllBooks = async (req, res) => {
 
 exports.getBookDetails = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id).populate("genre", "name");
+    const book = await Book.findById(req.params.id)
+      .populate("genre", "name")
+      .sort({ createdAt: -1 });
 
     if (!book) {
       return res.status(404).json({ msg: "Books not found" });
@@ -27,13 +29,10 @@ exports.getBookDetails = async (req, res) => {
 };
 
 exports.createBook = async (req, res) => {
-  const { title, author, genreName, description } = req.body;
+  const { title, author, genre, description } = req.body;
 
   try {
-    // Find the genre by name (case-insensitive)
-    const genre = await Genre.findOne({
-      name: new RegExp(`^${genreName}$`, "i"),
-    });
+    const genreExists = await Genre.findById(genre);
 
     if (!genre) {
       return res.status(400).json({ msg: "Genre not found!" });
@@ -42,7 +41,7 @@ exports.createBook = async (req, res) => {
     const newBook = new Book({
       title,
       author,
-      genre: genre._id, // Use the ObjectId of the genre
+      genre,
       description,
     });
 
@@ -55,7 +54,7 @@ exports.createBook = async (req, res) => {
 };
 
 exports.updateBook = async (req, res) => {
-  const { title, author, genreName, description } = req.body;
+  const { title, author, genre, description } = req.body;
 
   try {
     // Find book and validate existence
@@ -65,17 +64,14 @@ exports.updateBook = async (req, res) => {
     }
 
     // Handle genre update if provided
-    if (genreName) {
-      const genre = await Genre.findOne({
-        name: new RegExp(`^${genreName}$`, "i"),
-      });
-
-      if (!genre) {
+    if (genre) {
+      const genreExists = await Genre.findById(genre);
+      if (!genreExists) {
         return res.status(400).json({
           msg: "Genre not found",
         });
       }
-      book.genre = genre._id;
+      book.genre = genre;
     }
 
     // Update other fields if provided
