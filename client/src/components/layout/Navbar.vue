@@ -73,7 +73,6 @@ if (isLoggedIn.value) {
           <router-link
             to="/"
             class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
-            :class="{ 'text-blue-400': route.path === '/' }"
           >
             Home
           </router-link>
@@ -83,14 +82,12 @@ if (isLoggedIn.value) {
             <router-link
               to="/books"
               class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
-              :class="{ 'text-blue-400': route.path === '/books' }"
             >
               Books
             </router-link>
             <router-link
               to="/genres"
               class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition duration-300"
-              :class="{ 'text-blue-400': route.path === '/genres' }"
             >
               Genres
             </router-link>

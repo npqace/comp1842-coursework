@@ -1,4 +1,3 @@
-// client/src/pages/UserProfile.vue
 <script setup>
 import { ref, onMounted } from "vue";
 import { useStore } from "vuex";
