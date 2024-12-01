@@ -2,13 +2,16 @@
 import { ref, onMounted } from "vue";
 import api from "../../utils/axios";
 import GenreForm from "../../components/Genre/GenreForm.vue";
+import Confirm from "../../components/alerts/ConfirmDialog.vue";
 
+// State management
 const genres = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const showForm = ref(false);
-const newGenre = ref("");
+const editingGenre = ref(null);
 
+// Fetch all genres
 const fetchGenres = async () => {
   try {
     const response = await api.get("/genres");
@@ -20,27 +23,54 @@ const fetchGenres = async () => {
   }
 };
 
+// Create or Update Genre
 const handleGenreSubmit = async (name) => {
   try {
-    await api.post("/genres", { name });
+    if (editingGenre.value) {
+      // Update existing genre
+      await api.put(`/genres/${editingGenre.value._id}`, { name });
+    } else {
+      // Create new genre
+      await api.post("/genres", { name });
+    }
+
+    // Reset form and refresh genres
     showForm.value = false;
+    editingGenre.value = null;
     await fetchGenres();
   } catch (err) {
-    error.value = err.response?.data?.msg || "Failed to create genre";
+    error.value =
+      err.response?.data?.msg ||
+      (editingGenre.value
+        ? "Failed to update genre"
+        : "Failed to create genre");
   }
 };
 
-const deleteGenre = async (id) => {
-  if (!confirm('Are you sure you want to delete this genre?')) return;
+// Prepare to edit a genre
+const startEditGenre = (genre) => {
+  editingGenre.value = genre;
+  showForm.value = true;
+};
 
+// Delete a genre
+const deleteGenre = async (id) => {
+  if (!confirm("Are you sure you want to delete this genre?")) return;
   try {
     await api.delete(`/genres/${id}`);
     await fetchGenres();
   } catch (err) {
-    error.value = err.response?.data?.msg || 'Failed to delete genre';
+    error.value = err.response?.data?.msg || "Failed to delete genre";
   }
 };
 
+// Cancel form editing
+const cancelForm = () => {
+  showForm.value = false;
+  editingGenre.value = null;
+};
+
+// Fetch genres on component mount
 onMounted(() => {
   fetchGenres();
 });
@@ -63,11 +93,12 @@ onMounted(() => {
       {{ error }}
     </div>
 
-    <!-- New Genre Form -->
+    <!-- Genre Form (for Create and Update) -->
     <GenreForm
       :show="showForm"
+      :initial-name="editingGenre?.name"
       @submit="handleGenreSubmit"
-      @cancel="showForm = false"
+      @cancel="cancelForm"
     />
 
     <!-- Loading State -->
@@ -81,12 +112,20 @@ onMounted(() => {
         class="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
       >
         <span class="text-lg">{{ genre.name }}</span>
-        <button
-          @click="deleteGenre(genre._id)"
-          class="text-red-400 hover:text-red-300"
-        >
-          Delete
-        </button>
+        <div class="space-x-2">
+          <button
+            @click="startEditGenre(genre)"
+            class="text-blue-400 hover:text-blue-300 mr-2"
+          >
+            Edit
+          </button>
+          <button
+            @click="deleteGenre(genre._id)"
+            class="text-red-400 hover:text-red-300"
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
 
@@ -99,3 +138,7 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Optional: Add any additional styling */
+</style>

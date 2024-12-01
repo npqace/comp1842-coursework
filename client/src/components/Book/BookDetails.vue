@@ -13,7 +13,7 @@ defineProps({
       <h2 class="text-xl font-semibold text-blue-400">{{ book.title }}</h2>
       <p class="text-gray-300">by {{ book.author }}</p>
       <p class="text-gray-400 mt-2">Genre: {{ book.genre.name }}</p>
-      <p class="text-gray-400 mt-2">
+      <!-- <p class="text-gray-400 mt-2">
         Status:
         <span
           :class="{
@@ -24,7 +24,7 @@ defineProps({
         >
           {{ book.status }}
         </span>
-      </p>
+      </p> -->
       <p class="text-gray-400 mt-4">
         {{ book.description || "No description available" }}
       </p>

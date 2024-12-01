@@ -55,7 +55,7 @@ onMounted(() => {
         >
           <h3 class="text-xl font-semibold text-blue-400">{{ book.title }}</h3>
           <p class="text-gray-300">by {{ book.author }}</p>
-          <span
+          <!-- <span
             :class="{
               'text-red-400': book.status === 'Want to Read',
               'text-blue-400': book.status === 'Reading',
@@ -64,7 +64,7 @@ onMounted(() => {
             class="text-sm"
           >
             {{ book.status }}
-          </span>
+          </span> -->
         </div>
       </div>
 

@@ -1,10 +1,20 @@
 <script setup>
 import { ref, watch } from 'vue';
 
+// Props definition
 const props = defineProps({
-  book: {
+  show: {
+    type: Boolean,
+    default: false
+  },
+  initialBook: {
     type: Object,
-    required: true
+    default: () => ({
+      title: '',
+      author: '',
+      genre: '',
+      description: ''
+    })
   },
   genres: {
     type: Array,
@@ -16,96 +26,138 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['save', 'cancel']);
+// Emits definition
+const emit = defineEmits(['submit', 'cancel']);
 
-// Create a local copy of the book to avoid direct mutation of props
-const editedBook = ref({ ...props.book });
+// Reactive state for form input
+const bookData = ref({ ...props.initialBook });
 
-// Watch for changes in the prop and update local copy
-watch(() => props.book, (newBook) => {
-  editedBook.value = { ...newBook };
-}, { deep: true });
+// Watch for changes in initialBook (when editing)
+watch(() => props.initialBook, (newValue) => {
+  bookData.value = { ...newValue };
+}, { immediate: true });
 
-const onSave = () => {
-  emit('save', editedBook.value);
+// Form submission handler
+const onSubmit = () => {
+  // Validate required fields
+  const requiredFields = ['title', 'author', 'genre'];
+  const missingFields = requiredFields.filter(field => 
+    !bookData.value[field] || bookData.value[field].trim() === ''
+  );
+
+  if (missingFields.length > 0) {
+    alert(`Please fill in the following fields: ${missingFields.join(', ')}`);
+    return;
+  }
+
+  // Emit submit event with book data
+  emit('submit', bookData.value);
+  
+  // Reset form (optional, may be handled by parent component)
+  bookData.value = { 
+    title: '',
+    author: '',
+    genre: '',
+    description: ''
+  };
+};
+
+// Cancel form
+const onCancel = () => {
+  // Reset form and emit cancel event
+  bookData.value = { ...props.initialBook };
+  emit('cancel');
 };
 </script>
 
 <template>
-  <form class="space-y-4" @submit.prevent="onSave">
-    <div>
-      <label class="block text-sm font-medium text-gray-300">Title</label>
-      <input
-        v-model="editedBook.title"
-        type="text"
-        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white"
-      />
-    </div>
+  <div 
+    v-if="show" 
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-gray-800 p-6 rounded-lg w-96 max-h-[90vh] overflow-y-auto">
+      <h2 class="text-2xl mb-4">
+        {{ initialBook.title ? 'Edit Book' : 'Add New Book' }}
+      </h2>
+      
+      <form @submit.prevent="onSubmit" class="space-y-4">
+        <div>
+          <label for="title" class="block mb-2">Title</label>
+          <input 
+            id="title"
+            v-model="bookData.title"
+            type="text"
+            required
+            class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter book title"
+          />
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-300">Author</label>
-      <input
-        v-model="editedBook.author"
-        type="text"
-        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white"
-      />
-    </div>
+        <div>
+          <label for="author" class="block mb-2">Author</label>
+          <input 
+            id="author"
+            v-model="bookData.author"
+            type="text"
+            required
+            class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter author name"
+          />
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-300">Genre</label>
-      <select
-        v-model="editedBook.genreName"
-        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white"
-      >
-        <option value="" disabled>Select a genre</option>
-        <option
-          v-for="genre in genres"
-          :key="genre._id"
-          :value="genre.name"
-        >
-          {{ genre.name }}
-        </option>
-      </select>
-      <span v-if="genreError" class="text-red-500 text-sm">
-        {{ genreError }}
-      </span>
-    </div>
+        <div>
+          <label for="genre" class="block mb-2">Genre</label>
+          <select
+            id="genre"
+            v-model="bookData.genre"
+            required
+            class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>Select a genre</option>
+            <option 
+              v-for="genre in genres" 
+              :key="genre._id" 
+              :value="genre._id"
+            >
+              {{ genre.name }}
+            </option>
+          </select>
+          <span v-if="genreError" class="text-red-500 text-sm mt-1">
+            {{ genreError }}
+          </span>
+        </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-300">Reading Status</label>
-      <select
-        v-model="editedBook.status"
-        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white"
-      >
-        <option value="Want to Read">Want to Read</option>
-        <option value="Reading">Reading</option>
-        <option value="Read">Read</option>
-      </select>
+        <div>
+          <label for="description" class="block mb-2">Description (Optional)</label>
+          <textarea
+            id="description"
+            v-model="bookData.description"
+            rows="4"
+            class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter book description"
+          ></textarea>
+        </div>
+        
+        <div class="flex justify-end space-x-2">
+          <button 
+            type="button"
+            @click="onCancel"
+            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition duration-300"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300"
+          >
+            {{ initialBook.title ? 'Update' : 'Add' }} Book
+          </button>
+        </div>
+      </form>
     </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-300">Description</label>
-      <textarea
-        v-model="editedBook.description"
-        rows="4"
-        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white"
-      ></textarea>
-    </div>
-
-    <div class="flex justify-end space-x-4">
-      <button
-        type="button"
-        @click="$emit('cancel')"
-        class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
-      >
-        Save
-      </button>
-    </div>
-  </form>
+  </div>
 </template>
+
+<style scoped>
+/* Optional: Add any additional styling */
+</style>

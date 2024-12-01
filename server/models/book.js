@@ -1,42 +1,41 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const bookSchema = new Schema({
-  title: {
-    type: String,
-    required: [true, "Title is required"],
-    trim: true,
-    minlength: [2, "Book title must be at least 2 characters long"],
-    maxlength: [50, "Book title cannot exceed 50 characters"],
-    validate: {
-      validator: function (v) {
-        return /^[a-zA-Z\s-]+$/.test(v);
+const bookSchema = new Schema(
+  {
+    title: {
+      type: String,
+      required: [true, "Title is required"],
+      trim: true,
+      minlength: [2, "Book title must be at least 2 characters long"],
+      maxlength: [50, "Book title cannot exceed 50 characters"],
+      validate: {
+        validator: function (v) {
+          return /^[a-zA-Z\s-]+$/.test(v);
+        },
+        message: "Book title can only contain letters, spaces and hyphens",
       },
-      message: "Book title can only contain letters, spaces and hyphens",
+    },
+    author: {
+      type: String,
+      required: [true, "Author is required"],
+      trim: true,
+    },
+    genre: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Genre",
+      required: [true, "Genre is required"],
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Description cannot exceed 500 characters"],
     },
   },
-  author: {
-    type: String,
-    required: [true, "Author is required"],
-    trim: true,
-  },
-  genre: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Genre",
-    required: [true, "Genre is required"],
-  },
-  status: {
-    type: String,
-    enum: ["Want to Read", "Reading", "Read"],
-    required: [true, "Reading status is required"],
-    default: "Want to Read",
-  },
-  description: {
-    type: String,
-    trim: true,
-    maxlength: [500, "Description cannot exceed 500 characters"],
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Book schema pre-save middleware
 bookSchema.pre("save", function (next) {

@@ -5,6 +5,7 @@ import Home from "../pages/Home.vue";
 import BookList from "../pages/Book/BookList.vue";
 import BookDetails from "../pages/Book/BookDetailsPage.vue";
 import GenreList from "../pages/Genre/GenreList.vue";
+import UserProfile from "../pages/Profile/UserProfile.vue";
 import store from "../store/auth";
 
 const routes = [
@@ -41,6 +42,12 @@ const routes = [
     path: "/genres",
     name: "Genres",
     component: GenreList,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: UserProfile,
     meta: { requiresAuth: true },
   },
 ];

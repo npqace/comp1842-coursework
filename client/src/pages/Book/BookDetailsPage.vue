@@ -12,32 +12,15 @@ const route = useRoute();
 const book = ref(null);
 const loading = ref(true);
 const error = ref(null);
-const isEditing = ref(false);
+const showForm = ref(false);
 const genres = ref([]);
 const genreLoading = ref(true);
 const genreError = ref(null);
-
-// Form data
-const editedBook = ref({
-  title: "",
-  author: "",
-  genreName: "",
-  status: "",
-  description: "",
-});
 
 const fetchBook = async () => {
   try {
     const response = await api.get(`/books/${route.params.id}`);
     book.value = response.data;
-    // Initialize edit form
-    editedBook.value = {
-      title: book.value.title,
-      author: book.value.author,
-      genreName: book.value.genre.name,
-      status: book.value.status,
-      description: book.value.description || "",
-    };
     loading.value = false;
   } catch (err) {
     error.value = "Failed to load book details";
@@ -56,20 +39,12 @@ const fetchGenres = async () => {
   }
 };
 
-const handleEdit = () => {
-  isEditing.value = true;
+const prepareEditBook = () => {
+  showForm.value = true;
 };
 
-const handleCancel = () => {
-  isEditing.value = false;
-  // Reset form
-  editedBook.value = {
-    title: book.value.title,
-    author: book.value.author,
-    genreName: book.value.genre.name,
-    status: book.value.status,
-    description: book.value.description || "",
-  };
+const cancelEdit = () => {
+  showForm.value = false;
 };
 
 const handleSave = async (updatedBook) => {
@@ -79,7 +54,7 @@ const handleSave = async (updatedBook) => {
       updatedBook
     );
     book.value = response.data.book;
-    isEditing.value = false;
+    showForm.value = false;
   } catch (err) {
     error.value = "Failed to update book";
   }
@@ -88,7 +63,7 @@ const handleSave = async (updatedBook) => {
 const handleDelete = async () => {
   if (confirm("Are you sure you want to delete this book?")) {
     try {
-      await api.delete(`books/${route.params.id}`);
+      await api.delete(`/books/${route.params.id}`);
       router.push("/books");
     } catch (err) {
       error.value = "Failed to delete book";
@@ -119,14 +94,12 @@ onMounted(() => {
         <h1 class="text-3xl font-bold">Book Details</h1>
         <div class="space-x-4">
           <button
-            v-if="!isEditing"
-            @click="handleEdit"
+            @click="prepareEditBook"
             class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
           >
             Edit
           </button>
           <button
-            v-if="!isEditing"
             @click="handleDelete"
             class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
           >
@@ -137,18 +110,24 @@ onMounted(() => {
 
       <!-- View Mode -->
       <BookDetails
-        v-if="!isEditing && book" 
+        v-if="!showForm && book" 
         :book="book" 
       />
 
       <!-- Edit Mode -->
       <BookForm 
-        v-if="isEditing && book"
-        :book="editedBook"
+        v-if="showForm && book"
+        :show="showForm"
+        :initial-book="{
+          title: book.title,
+          author: book.author,
+          genreName: book.genre.name,
+          description: book.description || ''
+        }"
         :genres="genres"
         :genre-error="genreError"
-        @save="handleSave"
-        @cancel="handleCancel"
+        @submit="handleSave"
+        @cancel="cancelEdit"
       />
     </div>
   </div>
