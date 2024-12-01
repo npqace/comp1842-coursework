@@ -46,6 +46,11 @@ const closeDropdown = (event) => {
   }
 };
 
+// Close dropdown on navigation
+const closeDropdownOnNavigate = () => {
+  isDropdownOpen.value = false;
+};
+
 // Add and remove event listener
 if (isLoggedIn.value) {
   document.addEventListener("click", closeDropdown);
@@ -132,7 +137,8 @@ if (isLoggedIn.value) {
                 <router-link
                   to="/profile"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-300"
-                >
+                  @click="closeDropdownOnNavigate"
+                  >
                   Profile
                 </router-link>
                 <button
