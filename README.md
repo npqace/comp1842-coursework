@@ -160,7 +160,7 @@ client/
 |   ├── App.vue
 |   ├── main.js
 |   ├── tailwind.config.js
-|   ├── postcss.config.js
+|   └── postcss.config.js
 ```
 
 ## API Documentation
