@@ -49,10 +49,7 @@ const cancelEdit = () => {
 
 const handleSave = async (updatedBook) => {
   try {
-    const response = await api.put(
-      `/books/${route.params.id}`,
-      updatedBook
-    );
+    const response = await api.put(`/books/${route.params.id}`, updatedBook);
     book.value = response.data.book;
     showForm.value = false;
   } catch (err) {
@@ -109,20 +106,17 @@ onMounted(() => {
       </div>
 
       <!-- View Mode -->
-      <BookDetails
-        v-if="!showForm && book" 
-        :book="book" 
-      />
+      <BookDetails v-if="!showForm && book" :book="book" />
 
       <!-- Edit Mode -->
-      <BookForm 
+      <BookForm
         v-if="showForm && book"
         :show="showForm"
         :initial-book="{
           title: book.title,
           author: book.author,
-          genreName: book.genre.name,
-          description: book.description || ''
+          genre: book.genre._id, // Changed from genreName to genre ID
+          description: book.description || '',
         }"
         :genres="genres"
         :genre-error="genreError"
